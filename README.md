@@ -8,7 +8,6 @@
   <a href="https://github.com/Alexanderiscool1">Alexanderiscool1</a>
 </div>
 <br><br>
-Insert image later
 
 ## Overview
 We built a CNN to predict M and X-Class flares using mutli-model data. Using AI Explainabillity techniques, we attempted to solve the **Black Box** problem in order to see why the model is making its decisions. 
@@ -169,8 +168,46 @@ Our best model produced these results:
   * Our .62 TSS score shows that our model is able to differentiate a quiet and flare event
   * This is a production quality TSS in solar forecasting
 
+## Model Explainability
 
+### Saliency Maps
+* Grad-CAM and specifically the attention map shows that the model targeted active-region green zones, which shows high magnetic strength, but also suffered from boundary shortcut learning near edge padding
+  * Edge = high contrast between mangetogram and empty space, leading to more attraction of CNN filters
+  * The model did not focus highly on the **Polarity Inversion Line**, which is where most flares happen
+* **Spatial Ablation**: Blurring edge pixels actually increased confidence slightly
+   * This may have been because it removed boundary noise (i.e., from the edges), allowing the model to focus on the Polarity Inversion Line and other green zones
 
+<figure>
+  <img src="https://github.com/user-attachments/assets/4dc5791f-c3ca-493b-a826-e4cda2952d12" alt="Alternate description text">
+  <figcaption align="center"><b></b> The first column shows the magnetogram. The second column shows the attention map. The third column shows the Grad-CAM. The fourth column shows the magnetogram after the spatial ablation.</figcaption>
+</figure>
+<br><br>
 
+### Feature Attribution 
+* Modality Ablation: 
+  * Removing images entirely caused a 6.5% drop in confidence,
+  * Removing the entire tabular data caused a 36.8% drop in confidence
+  * This shows that the model relied heavily on tabular data and confirming that images provided vital spatial context
+* SHAP plot proved that current helicity (TOTUSJH, R_VALUE, MEANJZH) and magnetic shear (MEANSHR) drove flare prediction 
+
+<figure>
+  <img src="https://github.com/user-attachments/assets/3e0f573c-687b-446a-8e4d-955364999f6a" alt="Alternate description text">
+  <figcaption align="center"><b></b>Evaluation set contains mostly non-flaring regions evaluated against a 30-flare baseline, meaning when the model encounters a region with low magnetic current and helicity, it pushes its prediction away from a flare. This is accurate to real solar physics.</figcaption>
+</figure>
+<br><br>
+
+#### Key Takeaway: The model is physically grounded and context-aware but is constrained by computer vision biases
+
+## Conclusion & Discussion
+* The model was able to successfully differentiate flares vs. no flares, as well as figure out potentially dangerous magnetograms
+* SHAP & Ablation analysis confirmed the model’s decisions were driven by real solar physics indicators like current helicity and magnetic shear, but Grad-CAM revealed a tendency for boundary shortcut learning
+* Future work:
+   * Explicitly guiding future architectures to focus on the Polarity Inversion Line through a loss function
+   * Temporal Data: Allows the model to track the evolution of a specific active region (e.g., 24 hour time span)
+   * Run on multiple seeds: Our final model was a specific epoch of it. We did did run multiple times, and got similar results, but we didn't do a full on mutli-seed experiment.
+* Real-World Application: Enhances automated space weather forecasting to protect infrastructure and public safety 
+* Unlike traditional models that analyze data like magnetograms in isolation, our architecture dynamically uses tabular and spatial data, forcing the model to learn mathematically and physically consistent precursors to solar flares 
+
+> Note: This project is considered complete.
 
 
