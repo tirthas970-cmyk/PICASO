@@ -16,7 +16,7 @@ Data consists of magnetograms and physical qualities that correlate with solar f
 Methodology:
 <img width="1403" height="821" alt="image" src="https://github.com/user-attachments/assets/d9042b36-a004-4a95-87b5-525e8fe7b080" />
 
-## 📁 Repository Structure
+## Repository Structure
 
 ```text
 PICASO/
@@ -46,41 +46,13 @@ PICASO/
 
 ## Getting Started & Reproducibility
 
-### 1. Environment Setup
-To replicate our data validation settings or execute the master modeling notebook locally, clone this repository and configure the environment:
+* You only really need to run the PICASO_Final.ipynb notebook to validate our code. The other scripts are just meant to show you what we did, but are not meant to be run again.
 
-```bash
-# Clone the repository
-git clone https://github.com
+The training and evaluation architectures are completely defined. To run the scripts in the evaluation section of our notebook, you need our final model, so
 
-# Navigate into the project root directory
-cd PICASO
+ **[Click Here to Access our Pre-trained Model Checkpoint on Hugging Face](https://huggingface.co/datasets/X-FlareNet/solar-flare-magnetogram-shards/tree/main)**
 
-# Install dependencies (once requirements.txt is populated)
-# pip install -r requirements.txt
-```
-
-### 2. Initializing Partitions via Relative Subdirectories
-To stream data files into your local or cloud data loaders while maintaining exact experimental reproducibility, load our frozen Active Region sets using standard Python relative hooks:
-
-```python
-import os
-import pandas as pd
-
-# Load master table and frozen sets using relative paths
-data_path = os.path.join("data", "solar_flare_61k_aligned_metadata_cleaned.csv")
-split_path = os.path.join("data", "splits", "train_ars.txt")
-
-df = pd.read_csv(data_path)
-
-with open(split_path, "r") as f:
-    train_regions = [int(line.strip()) for line in f]
-
-# Filter down to isolated training instances
-df_train = df[df["noaa_id"].isin(train_regions)]
-print(f"Successfully loaded {len(df_train)} leakage-free training instances.")
-```
-
+> After you download the model, you do need to configure the evaluation section to use your downloaded model instead of the google drive path we used.
 
 ## Introduction
 Solar flares are large outbursts on the sun that send bursts of energy, light, and fast-moving particles into space.
