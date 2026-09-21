@@ -14,6 +14,10 @@ Insert image later
 We built a CNN to predict M and X-Class flares using mutli-model data. Using AI Explainabillity techniques, we attempted to solve the **Black Box** problem in order to see why the model is making its decisions. 
 Data consists of magnetograms and physical qualities that correlate with solar flare activity
 
+Methodology:
+<img width="1403" height="821" alt="image" src="https://github.com/user-attachments/assets/d9042b36-a004-4a95-87b5-525e8fe7b080" />
+
+
 ## Introduction
 Solar flares are large outbursts on the sun that send bursts of energy, light, and fast-moving particles into space.
 They are grouped by power:
@@ -60,5 +64,113 @@ Our Hugging Face dataset also contains our splits and the meta-table.
 
 Empirical Data Statistics
 
-Create table
+| Total Mangetograms | 60785
+| --- | --- |
+| Quiet Regions | 58453
+| M-Class Flares| 2074
+| X-Class Flares| 258
+
+### Data Processing
+
+We used the Cylindrical Equal Area (CEA) projection version of the magnetograms. CEA is used to ensure that pixel sizes correspond to equal physical areas on the Sun. It works by wrapping a cylinder around a sphere and then projecting the surface outwards. The grid lines for latitude are spaced proportional to the sine of latitude.
+
+Our images were padded into a uniform 512 x 512, preventing ratio distortion, and preserving spatial coordinates.
+
+To mitigate the severe class imbalance we implemented focal loss and class weights:
+
+#### 1. Inverse Log Class Weights
+
+For a given class distribution count vector $N$, the inverse frequency for class $i$ is calculated as:
+
+$$\text{InvFreq}_i = \frac{\sum_{j} N_j}{N_i}$$
+
+The log-smoothed weight with a $1.0$ offset is defined as:
+
+$$w_i = \ln(\text{InvFreq}_i) + 1.0$$
+
+The final class balance coefficient $\alpha_i$ is normalized relative to the first class ($w_0$):
+
+$$\alpha_i = \frac{w_i}{w_0}$$
+
+---
+
+#### 2. Balanced Focal Loss
+
+For a single sample with target class $t$, let $p_t$ be the model's estimated probability for that ground-truth class. The standard cross-entropy loss is:
+
+$$\text{CE}(p_t) = -\ln(p_t)$$
+
+Applying the focusing parameter $\gamma$ and the normalized class weight $\alpha_t$, the balanced focal loss for that sample is:
+
+$$\text{FL}(p_t) = -\alpha_t (1 - p_t)^\gamma \ln(p_t)$$
+
+The final batch loss optimized during the forward pass is the mean over $N$ samples:
+
+$$\mathcal{L} = \frac{1}{N} \sum_{n=1}^{N} \alpha_{t_n} (1 - p_{t_n})^\gamma \text{CE}(p_{t_n})$$
+
+---
+
+#### 3. Hierarchical Loss Formulation
+
+The multi-head loss combines the binary head (Quiet vs. Flare) and the severity head (M-Class vs. X-Class) using an indicator mask $\mathbb{I}$:
+
+$$\mathcal{L}_{\text{total}} = \mathcal{L}_{\text{binary}} + \mathbb{I}_{(\text{targets} > 0)} \cdot \mathcal{L}_{\text{severity}}$$
+
+## Model Architecture 
+
+<img width="1800" height="675" alt="image" src="https://github.com/user-attachments/assets/20b160af-8d17-4eda-86ec-a8ae788ba8d5" />
+
+
+### Feature Extraction & Tokenization 
+* **Spatial Processing**: Stripped the pooling/classification layers from a standard ResNet-18 to capture the raw spatial tensor of shape (B, 512, H’, W’)
+* Flattened the 2D grid into sequence-first image tokens of shape (B, H’*W’, 512)
+* Implemented 2D positional encoding in order to preserve spatial features
+  * Split the 512 channels into independent vertical (256) and horizontal (256) sine/cosine grids
+* Processed 9 physical parameters through 9 separate MLP for each instead of one concentrated vector
+* Each independent parameter is projected into 512-dimensional embedding, creating a stacked sequence of shape (B, 9, 512)
+
+### Asymmetric Fusion & Dual Head Inference
+* Implemented a Cross-Attention engine:
+  * Tabular tokens act as queries, and spatial tokens act as keys/values
+  * This answers *Which unique region of the magnetogram matters most for these specific physical measurements?*
+* Computed attention matrix is added directly back to the original tabular physics token (Residual Fusion)
+  * Guarantees the network remembers input parameters after spatial contextualization 
+* Transformer Encoder Layer: Forces the 9 parameters to talk to each other only after they have fully processed the spatial image conext 
+* Dual Linear Heads: The final averaged vector (from Global Pooling) is fed into the parallel MLPs to simultaneously output:
+  * Head 1: Flare vs. No Flare (Binary)
+  * Head 2: M-Class vs. X-Class
+* Model also outputs attention weights, which is where the model is focusing on
+
+## Results:
+
+Our best model produced these results:
+
+| Metric | Value |
+| :--- | :--- |
+| **True Negatives** | 5,036 |
+| **False Positives** | 1,929 |
+| **False Negatives** | 26 |
+| **True Positives** | 229 |
+| **F1 Score** | 0.1898 |
+| **True Skill Statistic (TSS)** | 0.6211 |
+| **Heidke Skill Score (HSS)** | 0.1352 |
+
+**Confusion Matrix on Test Set**:
+<img width="565" height="482" alt="image" src="https://github.com/user-attachments/assets/5e426572-ae30-4aa7-ad27-f2fb4b6a9752" />
+
+### Interpreting The Results:
+* Low F1 & HSS scores due to the high FP rates and low precision
+  * Most likely from the class imbalance as flares only made it up about 3% of our total data 
+  * To minimize being penalized heavily, the model may have guessed ‘yes’ and risk false positive 
+  * Another interesting theory we had was that some magnetograms may look dangerous and erupt as a flare, but many stressed regions can rotate out of view without actually erupting
+     * Known as the **loaded gun** effect in solar forecasting
+* The TSS score was high as TSS calculates the difference between the true positive rate and the false positive rate
+  * This means that TSS is independent of the class imbalance 
+  * Our .62 TSS score shows that our model is able to differentiate a quiet and flare event
+  * This is a production quality TSS in solar forecasting
+
+
+
+
+
 
