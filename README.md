@@ -192,6 +192,7 @@ Our best model produced these results:
 | **Heidke Skill Score (HSS)** | 0.1352 |
 
 **Confusion Matrix on Test Set**:
+
 <img width="565" height="482" alt="image" src="https://github.com/user-attachments/assets/5e426572-ae30-4aa7-ad27-f2fb4b6a9752" />
 
 ### Interpreting The Results:
