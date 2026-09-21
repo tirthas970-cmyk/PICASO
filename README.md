@@ -256,6 +256,7 @@ Our best model produced these results:
 * <a href="https://github.com/tirthas970-cmyk">tirthas970-cmyk</a>: Did majority of the coding and programming aspects of this project
 * <a href="https://github.com/Alexanderiscool1">Alexanderiscool1</a>: Did majority of the testing and physics interpretations of this project 
 
+> We didn't have actual full on mentor to overlook and guide every part of this project, so all of the code, and evaluations were done and analyzed by us without explicit mentor help.
 > Google Gemini was also used in this project for debugging scripts, and model ideas.
 ## Awards & Recognition:
 * **Innovation Award Recipient**: Awarded the top honor at the PAIRS Program for demonstrating the most original framework idea, novel interdisciplinary connection, and creative scientific contribution.
