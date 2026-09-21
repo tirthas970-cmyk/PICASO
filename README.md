@@ -16,6 +16,68 @@ Data consists of magnetograms and physical qualities that correlate with solar f
 Methodology:
 <img width="1403" height="821" alt="image" src="https://github.com/user-attachments/assets/d9042b36-a004-4a95-87b5-525e8fe7b080" />
 
+## Repository Structure
+
+```text
+PICASO/
+├── .gitignore                             # Excludes cache, local secrets, and system files
+├── requirements.txt                       # Verified project dependency versions
+├── PICASO_FINAL.ipynb                     # Master end-to-end research and training notebook
+│
+├── data/                                  # Structured data layer
+│   ├── splits/                            # Frozen, leak-free Active Region group partitions
+│   │   ├── train_ars.txt
+│   │   ├── val_ars.txt
+│   │   └── test_ars.txt
+│   └── solar_flare_61k_aligned_metadata_cleaned.csv  # Final synchronized data matrix
+│
+└── scripts/                               # Core backend pipeline modules
+    ├── download_data.py                   # Ingests raw images from JSOC into shards
+    ├── create_metadata_index.py           # Stream-parses shard files to generate metatables
+    ├── validate_clean_data.py             # Pre-cleanup quality assurance auditor
+    ├── merge_sharp_features.py            # Extracts and aligns 16 high-cadence SHARP parameters
+    ├── validate_and_clean_multimodal.py   # Runs priority deduplication and timeline interpolation
+    └── split_data.py                      # Iterative region-based partitioning logic
+```
+
+---
+
+## 🚀 Getting Started & Reproducibility
+
+### 1. Environment Setup
+To replicate our data validation settings or execute the master modeling notebook locally, clone this repository and configure the environment:
+
+```bash
+# Clone the repository
+git clone https://github.com
+
+# Navigate into the project root directory
+cd PICASO
+
+# Install dependencies (once requirements.txt is populated)
+# pip install -r requirements.txt
+```
+
+### 2. Initializing Partitions via Relative Subdirectories
+To easily stream data files into your local or cloud data loaders while maintaining exact experimental reproducibility, load our frozen Active Region sets using standard Python relative hooks:
+
+```python
+import os
+import pandas as pd
+
+# Load master table and frozen sets using relative paths
+data_path = os.path.join("data", "solar_flare_61k_aligned_metadata_cleaned.csv")
+split_path = os.path.join("data", "splits", "train_ars.txt")
+
+df = pd.read_csv(data_path)
+
+with open(split_path, "r") as f:
+    train_regions = [int(line.strip()) for line in f]
+
+# Filter down to isolated training instances
+df_train = df[df["noaa_id"].isin(train_regions)]
+print(f"Successfully loaded {len(df_train)} leakage-free training instances.")
+```
 
 ## Introduction
 Solar flares are large outbursts on the sun that send bursts of energy, light, and fast-moving particles into space.
@@ -216,9 +278,10 @@ Our best model produced these results:
 
 ### Acknowledgements:
 * PAIRS Program: Gave us guidance on our methodology
-  * At the end of this program, we presented our project and won the **Innovation Award** for the most original idea, novel interdisciplinary connection, and creative contribution
 * <a href="https://github.com/tirthas970-cmyk">tirthas970-cmyk</a>: Did majority of the coding and programming aspects of this project
 * <a href="https://github.com/Alexanderiscool1">Alexanderiscool1</a>: Did majority of the testing and physics interpretations of this project 
 
 > Google Gemini was also used in this project for debugging scripts, and model ideas.
+## Awards & Recognition:
+* Innovation Award Recipient: Awarded the top honor at the PAIRS Program for demonstrating the most original framework idea, novel interdisciplinary connection, and creative scientific contribution.
 
