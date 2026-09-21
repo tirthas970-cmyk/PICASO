@@ -16,33 +16,35 @@ Data consists of magnetograms and physical qualities that correlate with solar f
 Methodology:
 <img width="1403" height="821" alt="image" src="https://github.com/user-attachments/assets/d9042b36-a004-4a95-87b5-525e8fe7b080" />
 
-## Repository Structure
+## 📁 Repository Structure
 
 ```text
 PICASO/
 ├── .gitignore                             # Excludes cache, local secrets, and system files
 ├── requirements.txt                       # Verified project dependency versions
-├── PICASO_FINAL.ipynb                     # Master end-to-end research and training notebook
 │
 ├── data/                                  # Structured data layer
 │   ├── splits/                            # Frozen, leak-free Active Region group partitions
+│   │   ├── test_ars.txt
 │   │   ├── train_ars.txt
-│   │   ├── val_ars.txt
-│   │   └── test_ars.txt
-│   └── solar_flare_61k_aligned_metadata_cleaned.csv  # Final synchronized data matrix
+│   │   └── val_ars.txt
+│   └── solar_flare_61k_aligned_metadata_cleaned.csv  # Final synchronized multi-model meta-table
+│
+├── notebooks/                             # Cloud execution environments
+│   └── PICASO_FINAL.ipynb                 # Master end-to-end research and training notebook
 │
 └── scripts/                               # Core backend pipeline modules
-    ├── download_data.py                   # Ingests raw images from JSOC into shards
-    ├── create_metadata_index.py           # Stream-parses shard files to generate metatables
-    ├── validate_clean_data.py             # Pre-cleanup quality assurance auditor
-    ├── merge_sharp_features.py            # Extracts and aligns 16 high-cadence SHARP parameters
+    ├── create_metadata_index.py           # Stream-parses shard files to generate 1 metatable
+    ├── download_data.py                   # Fetches raw images from JSOC into shards
+    ├── merge_sharp_features.py            # Binds the 16 SHARP parameters into the meta-table 
+    ├── split_data.py                      # Active Region partitioning logic
     ├── validate_and_clean_multimodal.py   # Runs priority deduplication and timeline interpolation
-    └── split_data.py                      # Iterative region-based partitioning logic
+    └── validate_clean_data.py             # Pre-cleanup quality assurance auditor
 ```
 
 ---
 
-## 🚀 Getting Started & Reproducibility
+## Getting Started & Reproducibility
 
 ### 1. Environment Setup
 To replicate our data validation settings or execute the master modeling notebook locally, clone this repository and configure the environment:
@@ -59,7 +61,7 @@ cd PICASO
 ```
 
 ### 2. Initializing Partitions via Relative Subdirectories
-To easily stream data files into your local or cloud data loaders while maintaining exact experimental reproducibility, load our frozen Active Region sets using standard Python relative hooks:
+To stream data files into your local or cloud data loaders while maintaining exact experimental reproducibility, load our frozen Active Region sets using standard Python relative hooks:
 
 ```python
 import os
@@ -78,6 +80,7 @@ with open(split_path, "r") as f:
 df_train = df[df["noaa_id"].isin(train_regions)]
 print(f"Successfully loaded {len(df_train)} leakage-free training instances.")
 ```
+
 
 ## Introduction
 Solar flares are large outbursts on the sun that send bursts of energy, light, and fast-moving particles into space.
