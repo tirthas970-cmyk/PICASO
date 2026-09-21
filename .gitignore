@@ -1,0 +1,22 @@
+# Python bytecode and caching
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Local environment configuration secrets
+.env
+.env.local
+.env.*
+
+# Operating system system files
+.DS_Store
+Thumbs.db
+
+# VS Code workplace configurations
+.vscode/
+.history/
+
+# PyTorch/TensorFlow local logging and weights (if you test locally)
+*.log
+checkpoints/
+.ipynb_checkpoints/
