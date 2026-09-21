@@ -210,4 +210,15 @@ Our best model produced these results:
 
 > Note: This project is considered complete.
 
+## Developmental Timeline:
+* 1 and 1/2 of a month (Mid July to late august)
+* In August, we dedicated most of our time to this project ( ~ 5 hours a day)
+
+### Acknowledgements:
+* PAIRS Program: Gave us guidance on our methodology
+  * At the end of this program, we presented our project and won the **Innovation Award** for the most original idea, novel interdisciplinary connection, and creative contribution
+* <a href="https://github.com/tirthas970-cmyk">tirthas970-cmyk</a>: Did majority of the coding and programming aspects of this project
+* <a href="https://github.com/Alexanderiscool1">Alexanderiscool1</a>: Did majority of the testing and physics interpretations of this project 
+
+> Google Gemini was also used in this project for debugging scripts, and model ideas.
 
