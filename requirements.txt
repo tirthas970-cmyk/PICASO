@@ -1,0 +1,15 @@
+numpy
+pandas
+scikit-learn
+opencv-python
+matplotlib
+shap
+torch
+torchvision
+astropy
+sunpy[all]
+drms
+webdataset
+requests
+python-dotenv
+huggingface_hub
