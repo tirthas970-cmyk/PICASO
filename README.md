@@ -100,7 +100,7 @@ Our Hugging Face dataset also contains our splits and the meta-table.
 
 Empirical Data Statistics
 
-| Total Mangetograms | 60785
+| Total Magnetograms | 60785
 | --- | --- |
 | Quiet Regions | 58453
 | M-Class Flares| 2074
