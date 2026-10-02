@@ -261,4 +261,5 @@ Our best model produced these results:
 > Google Gemini was also used in this project for debugging scripts, and model ideas.
 ## Awards & Recognition:
 * **Innovation Award Recipient**: Awarded the top honor at the PAIRS Program for demonstrating the most original framework idea, novel interdisciplinary connection, and creative scientific contribution.
+   * Link: https://pairs-ml.vercel.app/
 
